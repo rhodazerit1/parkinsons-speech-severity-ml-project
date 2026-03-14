@@ -25,8 +25,7 @@ Unified Parkinson's Disease Rating Scale (UPDRS).
 The dataset contains biomedical voice measurements from Parkinson's patients
 along with clinical severity scores.
 
-Target variable:
-motor_UPDRS
+Link: https://www.kaggle.com/datasets/thedevastator/unlocking-clues-to-parkinson-s-disease-progressi/data 
 
 ## Models
 
