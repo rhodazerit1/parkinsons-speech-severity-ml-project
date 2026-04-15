@@ -7,6 +7,28 @@ np.random.seed(42)
 # loading the dataset
 data = pd.read_csv("../data/parkinsons_updrs.data.csv")
 
+# plot 1: correlation heatmap
+# shows which speech features relate most to motor_UPDRS
+
+heatmap_cols = [
+    "motor_UPDRS", "Jitter(%)", "Shimmer", "NHR", "RPDE", "DFA", "PPE"
+]
+
+# keep only columns that actually exist in the dataset
+heatmap_cols = [col for col in heatmap_cols if col in data.columns]
+
+corr_df = data[heatmap_cols].corr()
+
+plt.figure(figsize=(8, 6))
+plt.imshow(corr_df, cmap="coolwarm", aspect="auto", vmin=-1, vmax=1)
+plt.colorbar(label="Correlation")
+plt.xticks(range(len(corr_df.columns)), corr_df.columns, rotation=45, ha="right")
+plt.yticks(range(len(corr_df.index)), corr_df.index)
+plt.title("Correlation Heatmap of Key Speech Features")
+plt.tight_layout()
+plt.show()
+
+
 # target: motor_UPDRS
 y = data["motor_UPDRS"].values.reshape(-1, 1)
 
