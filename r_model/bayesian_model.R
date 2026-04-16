@@ -19,7 +19,7 @@ rinvchisq_custom <- function(n, df, scale) {
 }
 
 # Load data
-data <- read.csv("/parkinsons_updrs.data.csv")
+data <- read.csv('parkinsons_updrs.data.csv')
 
 
 # Train/test split
