@@ -8,82 +8,67 @@ st.set_page_config(page_title="Parkinson's Severity Prediction", layout="wide")
 
 st.markdown("""
 <style>
-  /* Base font and background */
-  html, body { background-color: #ffffff !important; color: #000000 !important; }
-  
-  .main, .block-container { background-color: #ffffff !important; }
+  /* Force white background everywhere */
+  .stApp { background-color: #ffffff !important; }
+  .main { background-color: #ffffff !important; }
+  .block-container { background-color: #ffffff !important; }
 
   /* Sidebar */
   section[data-testid="stSidebar"] { background-color: #f5f5f5 !important; }
-  section[data-testid="stSidebar"] * { color: #000000 !important; }
 
-  /* All text black */
-  p, span, div, label, li { color: #000000 !important; }
-  h1, h2, h3, h4, h5, h6 { color: #000000 !important; }
+  /* ALL text black */
+  * { color: #000000 !important; font-family: "Times New Roman", Times, serif !important; }
 
-  /* Fix code/backtick labels to be visible */
-  code {
-      background-color: #e8e8e8 !important;
+  /* Dropdown/selectbox popup background */
+  ul[data-testid="stSelectboxVirtualDropdown"],
+  div[data-baseweb="popover"],
+  div[data-baseweb="menu"],
+  ul[role="listbox"],
+  li[role="option"] {
+      background-color: #ffffff !important;
       color: #000000 !important;
-      padding: 2px 5px;
-      border-radius: 3px;
+  }
+  li[role="option"]:hover {
+      background-color: #f0f0f0 !important;
+  }
+
+  /* Selectbox input box */
+  div[data-baseweb="select"] > div {
+      background-color: #ffffff !important;
+      border: 1px solid #cccccc !important;
+      color: #000000 !important;
+  }
+
+  /* Input text inside selectbox */
+  div[data-baseweb="select"] input {
+      background-color: #ffffff !important;
+      color: #000000 !important;
   }
 
   /* Metric cards */
   [data-testid="stMetricDelta"] { display: none !important; }
   [data-testid="stMetric"] { background-color: #f0f0f0 !important; border-radius: 8px; padding: 12px; }
-  [data-testid="stMetricValue"] { color: #000000 !important; }
-  [data-testid="stMetricLabel"] { color: #000000 !important; }
 
-  /* Radio buttons — make circles visible */
+  /* Radio buttons */
   input[type="radio"] { accent-color: #1f77b4 !important; }
-  .stRadio label { color: #000000 !important; }
-  .stRadio div[role="radiogroup"] label { color: #000000 !important; }
 
-  /* Slider labels and values */
-  .stSlider label { color: #000000 !important; }
-  div[data-testid="stSlider"] p { color: #000000 !important; }
-
-  /* Slider thumb and track */
-  div[data-testid="stSlider"] input[type="range"] {
-      accent-color: #1f77b4 !important;
-  }
+  /* Slider */
+  div[data-testid="stSlider"] input[type="range"] { accent-color: #1f77b4 !important; }
   div[data-testid="stSlider"] input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none !important;
       background-color: #1f77b4 !important;
-      border: 2px solid #1f77b4 !important;
-      width: 18px !important;
-      height: 18px !important;
-      border-radius: 50% !important;
-      cursor: pointer !important;
+      width: 18px !important; height: 18px !important;
+      border-radius: 50% !important; cursor: pointer !important;
   }
   div[data-testid="stSlider"] input[type="range"]::-webkit-slider-runnable-track {
-      background-color: #cccccc !important;
-      height: 4px !important;
+      background-color: #cccccc !important; height: 4px !important;
   }
-  div[data-testid="stSlider"] input[type="range"]::-moz-range-thumb {
-      background-color: #1f77b4 !important;
-      border: 2px solid #1f77b4 !important;
-      width: 18px !important;
-      height: 18px !important;
-      border-radius: 50% !important;
-  }
-  div[data-testid="stSlider"] input[type="range"]::-moz-range-track {
-      background-color: #cccccc !important;
-      height: 4px !important;
-  }
-
-  /* Selectbox */
-  .stSelectbox label { color: #000000 !important; }
-  
-  /* Tabs */
-  button[data-baseweb="tab"] { color: #000000 !important; }
-
-  /* Info box */
-  .stAlert p { color: #000000 !important; }
 
   /* Links */
   a { color: #1a0dab !important; }
+
+  /* Code blocks */
+  code { background-color: #e8e8e8 !important; color: #000000 !important; padding: 2px 5px; border-radius: 3px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -95,15 +80,28 @@ data = load_data()
 
 page = st.sidebar.selectbox("Navigate", ["Landing Page", "Interactive Visualizations", "MLP Demo"])
 
-PLOT_LAYOUT = dict(
-    plot_bgcolor="white",
-    paper_bgcolor="white",
-    font=dict(family="Times New Roman", color="black"),
-    title_font=dict(family="Times New Roman", color="black"),
-    legend=dict(font=dict(color="black")),
-    xaxis=dict(title_font=dict(color="black"), tickfont=dict(color="black"), linecolor="black", gridcolor="#eeeeee"),
-    yaxis=dict(title_font=dict(color="black"), tickfont=dict(color="black"), linecolor="black", gridcolor="#eeeeee"),
-)
+def clean_layout(fig, title=None, xaxis_title=None, yaxis_title=None, yaxis_range=None):
+    layout = dict(
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(family="Times New Roman", color="black"),
+        title_font=dict(family="Times New Roman", color="black"),
+        legend=dict(font=dict(color="black")),
+    )
+    if title:
+        layout["title"] = dict(text=title, font=dict(color="black", family="Times New Roman"))
+    xax = dict(title_font=dict(color="black"), tickfont=dict(color="black"), linecolor="black", gridcolor="#eeeeee")
+    if xaxis_title:
+        xax["title"] = xaxis_title
+    yax = dict(title_font=dict(color="black"), tickfont=dict(color="black"), linecolor="black", gridcolor="#eeeeee")
+    if yaxis_title:
+        yax["title"] = yaxis_title
+    if yaxis_range:
+        yax["range"] = yaxis_range
+    layout["xaxis"] = xax
+    layout["yaxis"] = yax
+    fig.update_layout(**layout)
+    return fig
 
 # ============================================================
 # PAGE 1: LANDING PAGE
@@ -161,12 +159,9 @@ achieving an R² of **0.69** — demonstrating the power of nonlinear modeling f
 
 [Dataset Link](https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring)
         """)
-
         st.markdown("## Features Used")
-        # Use plain text list instead of backtick code formatting to avoid color clash
-        features = ["Jitter(%)", "Shimmer", "NHR", "HNR", "RPDE", "DFA", "PPE", "age", "sex", "test_time"]
-        st.markdown("\n".join([f"- {f}" for f in features]))
-
+        for f in ["Jitter(%)", "Shimmer", "NHR", "HNR", "RPDE", "DFA", "PPE", "age", "sex", "test_time"]:
+            st.markdown(f"- {f}")
         st.markdown("## Methods")
         st.markdown("""
 - Bayesian Linear Regression (manual, R)
@@ -205,15 +200,15 @@ elif page == "Interactive Visualizations":
             color=color_by, opacity=0.4,
             color_continuous_scale="Viridis",
             labels={"motor_UPDRS": "Motor UPDRS Score"},
-            title=f"{selected_feature} vs Motor UPDRS"
         )
         fig.update_traces(marker=dict(size=4))
         fig.add_trace(go.Scatter(
             x=x_line, y=y_line, mode="lines",
             line=dict(color="red", width=2, dash="dash"),
-            name="Trend", showlegend=False
+            showlegend=False
         ))
-        fig.update_layout(**PLOT_LAYOUT)
+        fig = clean_layout(fig, title=f"{selected_feature} vs Motor UPDRS",
+                           xaxis_title=selected_feature, yaxis_title="Motor UPDRS Score")
         fig.update_coloraxes(colorbar=dict(tickfont=dict(color="black"), title=dict(font=dict(color="black"))))
         st.plotly_chart(fig, use_container_width=True)
 
@@ -239,13 +234,9 @@ elif page == "Interactive Visualizations":
             mode="lines+markers", name="total UPDRS",
             line=dict(color="tomato", width=2, dash="dash"), marker=dict(size=6)
         ))
-        fig2.update_layout(
-            title=f"Patient {selected_subject}: UPDRS Over Time",
-            xaxis_title="Test Time (days)", yaxis_title="UPDRS Score",
-            hovermode="x unified",
-            **PLOT_LAYOUT
-        )
-        fig2.update_layout(legend=dict(orientation="h", font=dict(color="black")))
+        fig2 = clean_layout(fig2, title=f"Patient {selected_subject}: UPDRS Over Time",
+                            xaxis_title="Test Time (days)", yaxis_title="UPDRS Score")
+        fig2.update_layout(hovermode="x unified", legend=dict(orientation="h", font=dict(color="black")))
         st.plotly_chart(fig2, use_container_width=True)
 
         c1, c2, c3 = st.columns(3)
@@ -255,7 +246,7 @@ elif page == "Interactive Visualizations":
 
     with tab3:
         st.subheader("Model Performance Comparison")
-        models = ["Bayesian Linear (brms)", "Bayesian Linear (Manual)", "MLP Neural Network"]
+        models = ["Bayesian (brms)", "Bayesian (Manual)", "MLP"]
         r2_scores = [0.166, 0.30, 0.69]
         rmse_scores = [7.21, 6.79, 4.42]
         colors = ["#4C72B0", "#DD8452", "#55A868"]
@@ -265,28 +256,20 @@ elif page == "Interactive Visualizations":
             fig3 = go.Figure(go.Bar(
                 x=models, y=r2_scores, marker_color=colors,
                 text=[f"{v:.3f}" for v in r2_scores], textposition="outside",
-                textfont=dict(color="black")
+                textfont=dict(color="black", family="Times New Roman")
             ))
-            fig3.update_layout(
-                title="R² Score by Model (higher = better)",
-                yaxis=dict(range=[0, 0.85], title="R²"),
-                xaxis_title="Model",
-                **PLOT_LAYOUT
-            )
+            fig3 = clean_layout(fig3, title="R² Score by Model (higher = better)",
+                                xaxis_title="Model", yaxis_title="R²", yaxis_range=[0, 0.85])
             st.plotly_chart(fig3, use_container_width=True)
 
         with col2:
             fig4 = go.Figure(go.Bar(
                 x=models, y=rmse_scores, marker_color=colors,
                 text=[f"{v:.2f}" for v in rmse_scores], textposition="outside",
-                textfont=dict(color="black")
+                textfont=dict(color="black", family="Times New Roman")
             ))
-            fig4.update_layout(
-                title="RMSE by Model (lower = better)",
-                yaxis=dict(range=[0, 9], title="RMSE"),
-                xaxis_title="Model",
-                **PLOT_LAYOUT
-            )
+            fig4 = clean_layout(fig4, title="RMSE by Model (lower = better)",
+                                xaxis_title="Model", yaxis_title="RMSE", yaxis_range=[0, 9])
             st.plotly_chart(fig4, use_container_width=True)
 
         st.markdown("""
@@ -309,34 +292,22 @@ elif page == "MLP Demo":
         drop_cols = [c for c in ["motor_UPDRS", "total_UPDRS", "subject#", "index"] if c in data.columns]
         X = data.drop(columns=drop_cols).values.astype(float)
         y = data["motor_UPDRS"].values.astype(float).reshape(-1, 1)
-
         n = X.shape[0]
         indices = np.random.permutation(n)
         train_idx = indices[:int(0.8 * n)]
-        X_train_raw = X[train_idx]
-        y_train_raw = y[train_idx]
-
-        X_mean = X_train_raw.mean(axis=0)
-        X_std = X_train_raw.std(axis=0)
-        X_std[X_std == 0] = 1
-        X_train = (X_train_raw - X_mean) / X_std
-
-        y_mean = float(y_train_raw.mean())
-        y_std = float(y_train_raw.std())
-        y_train = (y_train_raw - y_mean) / y_std
-
-        d = X_train.shape[1]
-        h1, h2 = 64, 32
-        eta = 0.01
+        X_tr = X[train_idx]; y_tr = y[train_idx]
+        Xm = X_tr.mean(axis=0); Xs = X_tr.std(axis=0); Xs[Xs == 0] = 1
+        X_train = (X_tr - Xm) / Xs
+        ym = float(y_tr.mean()); ys = float(y_tr.std())
+        y_train = (y_tr - ym) / ys
+        d = X_train.shape[1]; h1, h2 = 64, 32; eta = 0.01
         W1 = np.random.randn(d, h1) * np.sqrt(2/d); b1 = np.zeros((1, h1))
         W2 = np.random.randn(h1, h2) * np.sqrt(2/h1); b2 = np.zeros((1, h2))
         W3 = np.random.randn(h2, 1) * np.sqrt(2/h2); b3 = np.zeros((1, 1))
-
         for epoch in range(500):
             perm = np.random.permutation(len(X_train))
             for i in range(0, len(X_train), 64):
-                Xb = X_train[perm[i:i+64]]
-                yb = y_train[perm[i:i+64]]
+                Xb = X_train[perm[i:i+64]]; yb = y_train[perm[i:i+64]]
                 Z1 = Xb @ W1 + b1; H1 = np.maximum(0, Z1)
                 Z2 = H1 @ W2 + b2; H2 = np.tanh(Z2)
                 yhat = H2 @ W3 + b3
@@ -350,9 +321,8 @@ elif page == "MLP Demo":
                 W2 -= eta*dW2; b2 -= eta*db2
                 W1 -= eta*dW1; b1 -= eta*db1
             eta *= 0.995
-
         feat_names = [c for c in data.columns if c not in ["motor_UPDRS", "total_UPDRS", "subject#", "index"]]
-        return (W1, b1, W2, b2, W3, b3), X_mean, X_std, y_mean, y_std, feat_names
+        return (W1, b1, W2, b2, W3, b3), Xm, Xs, ym, ys, feat_names
 
     with st.spinner("Training MLP model — please wait about 10 seconds..."):
         weights, X_mean, X_std, y_mean, y_std, feature_names = train_model()
@@ -363,8 +333,7 @@ elif page == "MLP Demo":
         x = (x_raw - X_mean) / X_std
         H1 = np.maximum(0, x @ W1 + b1)
         H2 = np.tanh(H1 @ W2 + b2)
-        result = float(np.squeeze(H2 @ W3 + b3))
-        return result * y_std + y_mean
+        return float(np.squeeze(H2 @ W3 + b3)) * y_std + y_mean
 
     st.markdown("### Adjust Feature Values")
     st.markdown("Use the sliders to set feature values. All other features are held at their median values.")
@@ -372,7 +341,6 @@ elif page == "MLP Demo":
     defaults = data[feature_names].median()
     col1, col2 = st.columns(2)
     user_inputs = {}
-
     key_features = [f for f in ["age", "sex", "test_time", "Jitter(%)", "Shimmer", "NHR", "HNR", "RPDE", "DFA", "PPE"] if f in feature_names]
     other_features = [f for f in feature_names if f not in key_features]
 
@@ -380,7 +348,6 @@ elif page == "MLP Demo":
         col = col1 if i % 2 == 0 else col2
         mn, mx, default = float(data[feat].min()), float(data[feat].max()), float(defaults[feat])
         user_inputs[feat] = col.slider(feat, min_value=mn, max_value=mx, value=default, key=feat)
-
     for feat in other_features:
         user_inputs[feat] = float(defaults[feat])
 
@@ -402,7 +369,7 @@ elif page == "MLP Demo":
             value=prediction,
             domain={"x": [0, 1], "y": [0, 1]},
             title={"text": "Motor UPDRS Score", "font": {"family": "Times New Roman", "color": "black"}},
-            number={"font": {"color": "black"}},
+            number={"font": {"color": "black", "family": "Times New Roman"}},
             gauge={
                 "axis": {"range": [0, 108], "tickfont": {"color": "black"}},
                 "bar": {"color": "steelblue"},
@@ -414,9 +381,7 @@ elif page == "MLP Demo":
                 "threshold": {"line": {"color": "black", "width": 3}, "thickness": 0.75, "value": prediction}
             }
         ))
-        fig_gauge.update_layout(
-            height=260, margin=dict(t=40, b=0),
-            paper_bgcolor="white",
-            font=dict(family="Times New Roman", color="black")
-        )
+        fig_gauge.update_layout(height=260, margin=dict(t=40, b=0),
+                                paper_bgcolor="white",
+                                font=dict(family="Times New Roman", color="black"))
         st.plotly_chart(fig_gauge, use_container_width=True)
