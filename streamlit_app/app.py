@@ -157,7 +157,7 @@ achieving an R² of **0.69** — demonstrating the power of nonlinear modeling f
 - **Features:** 16 acoustic features
 - **Target:** motor UPDRS score (0–108)
 
-[Dataset Link](https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring)
+[Dataset Link](https://www.kaggle.com/datasets/thedevastator/unlocking-clues-to-parkinson-s-disease-progressi/data)
         """)
         st.markdown("## Features Used")
         for f in ["Jitter(%)", "Shimmer", "NHR", "HNR", "RPDE", "DFA", "PPE", "age", "sex", "test_time"]:
