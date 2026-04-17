@@ -8,27 +8,24 @@ st.set_page_config(page_title="Parkinson's Severity Prediction", layout="wide")
 
 st.markdown("""
 <style>
-  html, body, [class*="css"] {
+  html, body, [class*="css"], p, span, div, label, li {
       font-family: "Times New Roman", Times, serif !important;
       background-color: #ffffff !important;
-      color: #111111 !important;
+      color: #000000 !important;
   }
-  .main, .block-container {
-      background-color: #ffffff !important;
-  }
-  section[data-testid="stSidebar"] {
-      background-color: #f5f5f5 !important;
+  .main, .block-container { background-color: #ffffff !important; color: #000000 !important; }
+  section[data-testid="stSidebar"], section[data-testid="stSidebar"] * {
+      background-color: #f5f5f5 !important; color: #000000 !important;
   }
   [data-testid="stMetricDelta"] { display: none !important; }
-  [data-testid="stMetric"] {
-      background-color: #f0f0f0;
-      border-radius: 8px;
-      padding: 12px;
-  }
-  h1, h2, h3, h4 {
-      font-family: "Times New Roman", Times, serif !important;
-      color: #111111 !important;
-  }
+  [data-testid="stMetric"] { background-color: #f0f0f0 !important; border-radius: 8px; padding: 12px; }
+  [data-testid="stMetricValue"], [data-testid="stMetricLabel"] { color: #000000 !important; }
+  h1, h2, h3, h4, h5, h6 { font-family: "Times New Roman", Times, serif !important; color: #000000 !important; }
+  .stMarkdown, .stMarkdown * { color: #000000 !important; }
+  button[data-baseweb="tab"] { font-family: "Times New Roman", Times, serif !important; color: #000000 !important; }
+  .stAlert { color: #000000 !important; }
+  .stSlider label { color: #000000 !important; }
+  a { color: #1a0dab !important; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -40,7 +37,9 @@ data = load_data()
 
 page = st.sidebar.selectbox("Navigate", ["Landing Page", "Interactive Visualizations", "MLP Demo"])
 
+# ============================================================
 # PAGE 1: LANDING PAGE
+# ============================================================
 if page == "Landing Page":
     st.title("Predicting Parkinson's Disease Severity from Voice")
     st.markdown("### DS 4420 Final Project — Spring 2026")
@@ -94,11 +93,9 @@ achieving an R² of **0.69** — demonstrating the power of nonlinear modeling f
 
 [Dataset Link](https://archive.ics.uci.edu/dataset/189/parkinsons+telemonitoring)
         """)
-
         st.markdown("## Features Used")
         for f in ["Jitter(%)", "Shimmer", "NHR", "HNR", "RPDE", "DFA", "PPE", "age", "sex", "test_time"]:
             st.markdown(f"- `{f}`")
-
         st.markdown("## Methods")
         st.markdown("""
 - Bayesian Linear Regression (manual, R)
@@ -106,7 +103,9 @@ achieving an R² of **0.69** — demonstrating the power of nonlinear modeling f
 - MLP Neural Network (manual, Python)
         """)
 
+# ============================================================
 # PAGE 2: INTERACTIVE VISUALIZATIONS
+# ============================================================
 elif page == "Interactive Visualizations":
     st.title("Interactive Data Visualizations")
     st.markdown("Explore the Parkinson's dataset and model results interactively.")
@@ -123,7 +122,6 @@ elif page == "Interactive Visualizations":
         selected_feature = st.selectbox("Choose a feature:", feature_cols, index=default_idx)
         color_by = st.radio("Color points by:", ["motor_UPDRS", "age", "sex"], horizontal=True)
 
-        # Manual trendline — no statsmodels needed
         x_vals = data[selected_feature].values.astype(float)
         y_vals = data["motor_UPDRS"].values.astype(float)
         mask = np.isfinite(x_vals) & np.isfinite(y_vals)
@@ -144,8 +142,7 @@ elif page == "Interactive Visualizations":
             line=dict(color="red", width=2, dash="dash"),
             name="Trend", showlegend=False
         ))
-        fig.update_layout(plot_bgcolor="white", paper_bgcolor="white",
-                          font=dict(family="Times New Roman"))
+        fig.update_layout(plot_bgcolor="white", paper_bgcolor="white", font=dict(family="Times New Roman", color="black"))
         st.plotly_chart(fig, use_container_width=True)
 
         corr = data[selected_feature].corr(data["motor_UPDRS"])
@@ -175,7 +172,7 @@ elif page == "Interactive Visualizations":
             xaxis_title="Test Time (days)", yaxis_title="UPDRS Score",
             legend=dict(orientation="h"), hovermode="x unified",
             plot_bgcolor="white", paper_bgcolor="white",
-            font=dict(family="Times New Roman")
+            font=dict(family="Times New Roman", color="black")
         )
         st.plotly_chart(fig2, use_container_width=True)
 
@@ -186,7 +183,6 @@ elif page == "Interactive Visualizations":
 
     with tab3:
         st.subheader("Model Performance Comparison")
-
         models = ["Bayesian Linear (brms)", "Bayesian Linear (Manual)", "MLP Neural Network"]
         r2_scores = [0.166, 0.30, 0.69]
         rmse_scores = [7.21, 6.79, 4.42]
@@ -200,9 +196,9 @@ elif page == "Interactive Visualizations":
             ))
             fig3.update_layout(
                 title="R² Score by Model (higher = better)",
-                yaxis=dict(range=[0, 0.85], title="R²"),
-                xaxis_title="Model", plot_bgcolor="white", paper_bgcolor="white",
-                font=dict(family="Times New Roman")
+                yaxis=dict(range=[0, 0.85], title="R²"), xaxis_title="Model",
+                plot_bgcolor="white", paper_bgcolor="white",
+                font=dict(family="Times New Roman", color="black")
             )
             st.plotly_chart(fig3, use_container_width=True)
 
@@ -213,9 +209,9 @@ elif page == "Interactive Visualizations":
             ))
             fig4.update_layout(
                 title="RMSE by Model (lower = better)",
-                yaxis=dict(range=[0, 9], title="RMSE"),
-                xaxis_title="Model", plot_bgcolor="white", paper_bgcolor="white",
-                font=dict(family="Times New Roman")
+                yaxis=dict(range=[0, 9], title="RMSE"), xaxis_title="Model",
+                plot_bgcolor="white", paper_bgcolor="white",
+                font=dict(family="Times New Roman", color="black")
             )
             st.plotly_chart(fig4, use_container_width=True)
 
@@ -225,7 +221,9 @@ highlighting that the relationship between voice features and motor UPDRS is fun
 The Bayesian models, while weaker predictively, offer interpretability through posterior distributions on coefficients.
         """)
 
+# ============================================================
 # PAGE 3: MLP DEMO
+# ============================================================
 elif page == "MLP Demo":
     st.title("Live MLP Prediction Demo")
     st.markdown("Adjust voice feature values below and get a predicted motor UPDRS score from our trained MLP.")
@@ -236,7 +234,7 @@ elif page == "MLP Demo":
         np.random.seed(42)
         drop_cols = [c for c in ["motor_UPDRS", "total_UPDRS", "subject#", "index"] if c in data.columns]
         X = data.drop(columns=drop_cols).values.astype(float)
-        y = data["motor_UPDRS"].values.reshape(-1, 1).astype(float)
+        y = data["motor_UPDRS"].values.astype(float).reshape(-1, 1)
 
         n = X.shape[0]
         indices = np.random.permutation(n)
@@ -294,7 +292,8 @@ elif page == "MLP Demo":
         x = (x_raw - X_mean) / X_std
         H1 = np.maximum(0, x @ W1 + b1)
         H2 = np.tanh(H1 @ W2 + b2)
-        return float((H2 @ W3 + b3) * y_std + y_mean)
+        result = float(np.squeeze(H2 @ W3 + b3))
+        return result * y_std + y_mean
 
     st.markdown("### Adjust Feature Values")
     st.markdown("Use the sliders to set feature values. All other features are held at their median values.")
@@ -314,7 +313,7 @@ elif page == "MLP Demo":
     for feat in other_features:
         user_inputs[feat] = float(defaults[feat])
 
-    x_input = np.array([user_inputs[f] for f in feature_names]).reshape(1, -1)
+    x_input = np.array([user_inputs[f] for f in feature_names], dtype=float).reshape(1, -1)
     prediction = float(np.clip(predict_one(x_input), 0, 108))
 
     st.divider()
@@ -331,7 +330,7 @@ elif page == "MLP Demo":
             mode="gauge+number",
             value=prediction,
             domain={"x": [0, 1], "y": [0, 1]},
-            title={"text": "Motor UPDRS Score", "font": {"family": "Times New Roman"}},
+            title={"text": "Motor UPDRS Score", "font": {"family": "Times New Roman", "color": "black"}},
             gauge={
                 "axis": {"range": [0, 108]},
                 "bar": {"color": "steelblue"},
@@ -343,6 +342,9 @@ elif page == "MLP Demo":
                 "threshold": {"line": {"color": "black", "width": 3}, "thickness": 0.75, "value": prediction}
             }
         ))
-        fig_gauge.update_layout(height=260, margin=dict(t=40, b=0),
-                                paper_bgcolor="white", font=dict(family="Times New Roman"))
+        fig_gauge.update_layout(
+            height=260, margin=dict(t=40, b=0),
+            paper_bgcolor="white",
+            font=dict(family="Times New Roman", color="black")
+        )
         st.plotly_chart(fig_gauge, use_container_width=True)
